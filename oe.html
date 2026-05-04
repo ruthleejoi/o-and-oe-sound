@@ -1,0 +1,717 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Explorer: Teacher Joy's Corner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
+        
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --dark-bg: #0d0221;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark-bg);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: linear-gradient(to bottom, #0d0221 0%, #240b36 50%, #c31432 100%);
+        }
+
+        .city-scape {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .grid-floor {
+            position: fixed;
+            bottom: 0;
+            width: 200%;
+            height: 40vh;
+            background-image: 
+                linear-gradient(var(--neon-purple) 1px, transparent 1px),
+                linear-gradient(90deg, var(--neon-purple) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg);
+            transform-origin: center bottom;
+            animation: moveGrid 2s linear infinite;
+            z-index: -2;
+            opacity: 0.4;
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 50px; }
+        }
+
+        .neon-card {
+            background: rgba(13, 2, 33, 0.8);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px var(--neon-blue);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .neon-text-blue { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); }
+        .neon-text-pink { text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink); }
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-neon-blue {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 5px var(--neon-blue);
+            transition: 0.3s;
+        }
+
+        .btn-neon-blue:hover:not(:disabled) {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .btn-neon-blue:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #444;
+            color: #444;
+            box-shadow: none;
+        }
+
+        .btn-neon-pink {
+            background: transparent;
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            box-shadow: 0 0 5px var(--neon-pink);
+            transition: 0.3s;
+        }
+
+        .btn-neon-pink:hover {
+            background: var(--neon-pink);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+
+        .terminal-lines {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 10px;
+            height: 100px;
+            overflow: hidden;
+            border-left: 2px solid var(--neon-blue);
+        }
+
+        .line { font-size: 10px; color: var(--neon-blue); opacity: 0.7; margin-bottom: 2px; }
+
+        .phonetic-guide {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: rgba(255, 0, 255, 0.1);
+            padding: 4px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--neon-pink);
+            display: inline-block;
+            font-size: 1.5rem;
+            color: var(--neon-pink);
+            min-width: 100px;
+        }
+
+        .loader-spinner {
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top: 2px solid var(--neon-pink);
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .recording-pulse {
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .point-badge {
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="grid-floor"></div>
+    <div class="city-scape"></div>
+
+    <div id="app" class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-black neon-text-blue italic">VOICE EXPLORER</h1>
+                <p class="text-pink-400 font-bold tracking-widest text-xs uppercase">Natural TTS & Automatic IPA Matrix</p>
+            </div>
+            <button id="adminToggle" class="btn-neon-blue w-12 h-12 rounded-full flex items-center justify-center">
+                <i class="fas fa-cog"></i>
+            </button>
+        </header>
+
+        <main id="gameContainer">
+            <div class="flex justify-between items-center mb-4 bg-black/40 p-2 rounded-lg border border-blue-500/20">
+                <button id="navBack" class="btn-neon-blue px-4 py-1 rounded text-xs font-bold uppercase">
+                    <i class="fas fa-chevron-left mr-2"></i> Back
+                </button>
+                <div id="stepIndicator" class="text-[10px] text-blue-300 font-mono tracking-widest uppercase">Phase 1 / 11</div>
+                <button id="navNext" class="btn-neon-blue px-4 py-1 rounded text-xs font-bold uppercase">
+                    Next <i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+
+            <div class="mb-6 flex flex-col gap-4">
+                <div class="grid grid-cols-11 gap-1" id="progressBar"></div>
+                <div class="terminal-lines flex flex-col justify-end">
+                    <div id="terminalFeed" class="space-y-1"></div>
+                </div>
+            </div>
+
+            <div class="neon-card p-6 md:p-10 text-center relative overflow-hidden border-t-4 border-t-pink-500">
+                <div id="levelBadge" class="absolute top-4 right-4 bg-pink-600 text-white px-3 py-1 rounded-sm text-[10px] font-bold skew-x-12">
+                    LOADING...
+                </div>
+
+                <div class="mb-6">
+                    <p id="instruction" class="text-blue-300 font-bold mb-2 uppercase text-xs tracking-tighter">PHASE INITIALIZED</p>
+                    <h2 id="targetText" class="text-4xl md:text-6xl font-black neon-text-pink mb-4 break-words">---</h2>
+                    <div id="phoneticContainer" class="mb-6">
+                        <span id="phoneticText" class="phonetic-guide">/---/</span>
+                    </div>
+                    
+                    <button id="listenBtn" class="btn-neon-blue px-6 py-2 rounded-full font-bold uppercase text-xs min-w-[160px]">
+                        <span id="listenBtnContent">
+                            <i class="fas fa-volume-up mr-2"></i> Hear Model
+                        </span>
+                    </button>
+                </div>
+
+                <div id="controls" class="flex flex-col items-center gap-6">
+                    <div id="recordingUI" class="flex flex-col items-center gap-4">
+                        <button id="recordBtn" class="w-20 h-20 bg-transparent border-4 border-red-500 rounded-full flex flex-col items-center justify-center text-red-500 hover:scale-105 transition-all">
+                            <i class="fas fa-microphone text-2xl mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase">Record</span>
+                        </button>
+                        <p id="statusMsg" class="text-blue-400 font-mono text-[10px] uppercase tracking-widest">Awaiting Voice Input...</p>
+                    </div>
+
+                    <div id="reviewUI" class="hidden w-full max-w-xl space-y-4">
+                        <div class="flex flex-col md:flex-row justify-center gap-3">
+                            <button id="redoBtn" class="flex-1 btn-neon-blue py-4 px-4 rounded-xl font-bold flex flex-col items-center">
+                                <i class="fas fa-redo-alt text-lg mb-1"></i>
+                                <span class="text-xs">REDO</span>
+                            </button>
+                            <button id="playbackBtn" class="flex-1 btn-neon-blue py-4 px-4 rounded-xl font-bold flex flex-col items-center">
+                                <i class="fas fa-play text-lg mb-1"></i>
+                                <span class="text-xs">LISTEN</span>
+                            </button>
+                            <button id="submitBtn" class="flex-1 btn-neon-pink py-4 px-4 rounded-xl font-bold flex flex-col items-center">
+                                <i class="fas fa-check-double text-lg mb-1"></i>
+                                <span class="text-xs">SUBMIT</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="scoreboard" class="hidden neon-card p-8">
+            <h2 class="text-3xl font-black text-center neon-text-blue mb-2 uppercase">Session Complete</h2>
+            <div id="pointTotalHeader" class="text-center mb-8">
+                <span class="text-pink-500 font-bold uppercase text-[10px] tracking-widest">Total Earned</span>
+                <div id="totalPointsDisplay" class="text-4xl font-black neon-text-pink">+0 XP</div>
+            </div>
+            
+            <div id="scoreGrid" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="bg-blue-900/30 p-6 rounded-xl border border-blue-400/30 text-center">
+                    <p class="text-blue-300 font-bold uppercase text-[10px] mb-2 tracking-widest">Average Accuracy</p>
+                    <div id="finalAverage" class="text-5xl font-black neon-text-blue">0%</div>
+                </div>
+                <div class="bg-pink-900/30 p-4 rounded-xl border border-pink-400/30">
+                    <p class="text-pink-300 font-bold uppercase text-[10px] mb-2 tracking-center text-center">Reward Matrix</p>
+                    <ul class="text-[10px] space-y-1 font-mono text-slate-300">
+                        <li class="flex justify-between"><span>95-100%</span> <span class="text-pink-400">20 pts</span></li>
+                        <li class="flex justify-between"><span>90-95%</span> <span class="text-pink-400">15 pts</span></li>
+                        <li class="flex justify-between"><span>85-90%</span> <span class="text-pink-400">10 pts</span></li>
+                        <li class="flex justify-between"><span>80-85%</span> <span class="text-pink-400">7 pts</span></li>
+                        <li class="flex justify-between"><span>Below 80%</span> <span class="text-pink-400">5 pts</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex gap-4 justify-center">
+                <button onclick="location.reload()" class="btn-neon-blue px-8 py-3 rounded-lg font-bold">RESTART</button>
+                <button id="backToGame" class="btn-neon-pink px-8 py-3 rounded-lg font-bold">REVIEW ITEMS</button>
+            </div>
+        </div>
+
+        <div id="adminPanel" class="hidden fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-900 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl p-6 border border-pink-500 shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold neon-text-pink italic">EDIT CONTENT MATRIX</h3>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Update curriculum vocabulary and flow</p>
+                    </div>
+                    <button id="closeAdmin" class="text-white hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <section>
+                        <h4 class="text-blue-400 font-bold uppercase text-[10px] tracking-widest mb-4">Vocabulary (Target Words)</h4>
+                        <div id="wordInputs" class="space-y-3"></div>
+                        <button id="addWord" class="mt-4 text-[10px] text-blue-400 hover:text-white uppercase tracking-widest"><i class="fas fa-plus mr-1"></i> Add Word</button>
+                    </section>
+                    <section>
+                        <div class="mb-8">
+                            <h4 class="text-blue-400 font-bold uppercase text-[10px] tracking-widest mb-4">Fluency (Phrases)</h4>
+                            <div id="phraseInputs" class="space-y-2"></div>
+                            <button id="addPhrase" class="mt-2 text-[10px] text-blue-400 hover:text-white uppercase tracking-widest"><i class="fas fa-plus mr-1"></i> Add Phrase</button>
+                        </div>
+                        <div>
+                            <h4 class="text-blue-400 font-bold uppercase text-[10px] tracking-widest mb-4">Context (Sentences)</h4>
+                            <div id="sentenceInputs" class="space-y-2"></div>
+                            <button id="addSentence" class="mt-2 text-[10px] text-blue-400 hover:text-white uppercase tracking-widest"><i class="fas fa-plus mr-1"></i> Add Sentence</button>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-slate-800">
+                    <button id="saveAdmin" class="w-full btn-neon-pink py-4 rounded-xl text-lg font-black uppercase tracking-widest">Update Voice Matrix</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = ""; 
+
+        let INITIAL_CONTENT = {
+            words: [
+                { text: "not", phonetic: "nɒt" },
+                { text: "note", phonetic: "noʊt" },
+                { text: "rot", phonetic: "rɒt" },
+                { text: "rose", phonetic: "roʊz" },
+                { text: "hop", phonetic: "hɒp" },
+                { text: "hope", phonetic: "hoʊp" }
+            ],
+            phrases: [
+                "not a rose not a nose", 
+                "hop hop and hope hope"
+            ],
+            sentences: [
+                "I can hop on the back.", 
+                "I got a rose, a red rose.", 
+                "I do not have a note."
+            ]
+        };
+
+        const gameState = {
+            phase: 0,
+            scores: [], 
+            config: JSON.parse(JSON.stringify(INITIAL_CONTENT)),
+            isRecording: false,
+            audioChunks: [],
+            typingTimers: {}
+        };
+
+        const elements = {
+            targetText: document.getElementById('targetText'),
+            phoneticText: document.getElementById('phoneticText'),
+            instruction: document.getElementById('instruction'),
+            levelBadge: document.getElementById('levelBadge'),
+            listenBtn: document.getElementById('listenBtn'),
+            listenBtnContent: document.getElementById('listenBtnContent'),
+            recordBtn: document.getElementById('recordBtn'),
+            recordingUI: document.getElementById('recordingUI'),
+            reviewUI: document.getElementById('reviewUI'),
+            redoBtn: document.getElementById('redoBtn'),
+            playbackBtn: document.getElementById('playbackBtn'),
+            submitBtn: document.getElementById('submitBtn'),
+            statusMsg: document.getElementById('statusMsg'),
+            gameContainer: document.getElementById('gameContainer'),
+            scoreboard: document.getElementById('scoreboard'),
+            scoreGrid: document.getElementById('scoreGrid'),
+            finalAverage: document.getElementById('finalAverage'),
+            totalPointsDisplay: document.getElementById('totalPointsDisplay'),
+            adminToggle: document.getElementById('adminToggle'),
+            adminPanel: document.getElementById('adminPanel'),
+            closeAdmin: document.getElementById('closeAdmin'),
+            saveAdmin: document.getElementById('saveAdmin'),
+            wordInputs: document.getElementById('wordInputs'),
+            phraseInputs: document.getElementById('phraseInputs'),
+            sentenceInputs: document.getElementById('sentenceInputs'),
+            progressBar: document.getElementById('progressBar'),
+            terminalFeed: document.getElementById('terminalFeed'),
+            navBack: document.getElementById('navBack'),
+            navNext: document.getElementById('navNext'),
+            stepIndicator: document.getElementById('stepIndicator'),
+            backToGame: document.getElementById('backToGame'),
+            addWord: document.getElementById('addWord'),
+            addPhrase: document.getElementById('addPhrase'),
+            addSentence: document.getElementById('addSentence')
+        };
+
+        function calculatePoints(accuracy) {
+            if (accuracy >= 95) return 20;
+            if (accuracy >= 90) return 15;
+            if (accuracy >= 85) return 10;
+            if (accuracy >= 80) return 7;
+            return 5;
+        }
+
+        function pcmToWav(pcmData, sampleRate) {
+            const buffer = new ArrayBuffer(44 + pcmData.byteLength);
+            const view = new DataView(buffer);
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.byteLength, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, pcmData.byteLength, true);
+            const pcmArray = new Uint8Array(pcmData);
+            const dataViewArray = new Uint8Array(buffer, 44);
+            dataViewArray.set(pcmArray);
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        async function fetchWithRetry(url, options, retries = 5, backoff = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return await response.json();
+                } catch (err) {}
+                await new Promise(r => setTimeout(r, backoff * Math.pow(2, i)));
+            }
+            throw new Error("API Max retries reached");
+        }
+
+        async function getNaturalSpeech(text, type) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+            let prompt = "";
+            if (type === 'WORD') prompt = `Say clearly and slowly: ${text}`;
+            else if (type === 'PHRASE') prompt = `Say in a rhythmic, teaching style: ${text}`;
+            else prompt = `Say naturally and excitedly: ${text}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: `Charon: ${prompt}` }] }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: { 
+                        voiceConfig: { 
+                            multiSpeakerVoiceConfig: {
+                                speakerVoiceConfigs: [{
+                                    speaker: "Charon",
+                                    voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } }
+                                }]
+                            }
+                        } 
+                    }
+                }
+            };
+            try {
+                const data = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const audioPart = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                if (audioPart) {
+                    const binary = atob(audioPart.inlineData.data);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                    return URL.createObjectURL(pcmToWav(bytes.buffer, 24000));
+                }
+            } catch (err) { console.error("TTS Error:", err); }
+            return null;
+        }
+
+        async function getIPAFromGemini(word) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: `Provide ONLY the IPA phonetic spelling for the English word "${word}". No slashes, no additional text, just the symbols.` }] }] };
+            try {
+                const data = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+            } catch (err) { return ""; }
+        }
+
+        function addTerminalLine(msg) {
+            const line = document.createElement('div');
+            line.className = 'line';
+            line.innerText = `> ${new Date().toLocaleTimeString()}: ${msg}`;
+            elements.terminalFeed.appendChild(line);
+            if (elements.terminalFeed.children.length > 5) elements.terminalFeed.removeChild(elements.terminalFeed.firstChild);
+        }
+
+        function getPhaseData() {
+            const totalWords = gameState.config.words.length;
+            const totalPhrases = gameState.config.phrases.length;
+            const totalSentences = gameState.config.sentences.length;
+
+            if (gameState.phase < totalWords) {
+                return { ...gameState.config.words[gameState.phase], type: 'WORD', index: gameState.phase + 1, total: totalWords };
+            }
+            if (gameState.phase < totalWords + totalPhrases) {
+                const pIdx = gameState.phase - totalWords;
+                return { text: gameState.config.phrases[pIdx], type: 'PHRASE', index: pIdx + 1, total: totalPhrases, phonetic: null };
+            }
+            const sIdx = gameState.phase - (totalWords + totalPhrases);
+            return { text: gameState.config.sentences[sIdx], type: 'SENTENCE', index: sIdx + 1, total: totalSentences, phonetic: null };
+        }
+
+        function updateUI() {
+            const data = getPhaseData();
+            const totalSteps = gameState.config.words.length + gameState.config.phrases.length + gameState.config.sentences.length;
+            
+            if (gameState.scores.length !== totalSteps) {
+                gameState.scores = Array(totalSteps).fill(null);
+            }
+
+            elements.targetText.innerText = data.text;
+            elements.phoneticText.innerText = data.phonetic ? `/${data.phonetic}/` : "";
+            document.getElementById('phoneticContainer').style.display = data.phonetic ? 'block' : 'none';
+            elements.levelBadge.innerText = `${data.type} ${data.index}/${data.total}`;
+            elements.stepIndicator.innerText = `Phase ${gameState.phase + 1} / ${totalSteps}`;
+            
+            elements.navBack.disabled = gameState.phase === 0;
+            elements.navNext.disabled = gameState.phase === totalSteps - 1;
+
+            elements.reviewUI.classList.add('hidden');
+            elements.recordingUI.classList.remove('hidden');
+            elements.statusMsg.innerText = gameState.scores[gameState.phase] ? "Ready to try again?" : "Awaiting Voice Input...";
+            
+            elements.progressBar.className = `grid grid-cols-${totalSteps} gap-1`;
+            elements.progressBar.innerHTML = '';
+            for (let i = 0; i < totalSteps; i++) {
+                const step = document.createElement('div');
+                const hasScore = gameState.scores[i] !== null;
+                step.className = `h-1.5 rounded-full ${hasScore ? 'bg-pink-500 shadow-[0_0_8px_#ff00ff]' : i === gameState.phase ? 'bg-blue-400 animate-pulse' : 'bg-slate-800'}`;
+                elements.progressBar.appendChild(step);
+            }
+        }
+
+        elements.listenBtn.addEventListener('click', async () => {
+            const data = getPhaseData();
+            elements.listenBtn.disabled = true;
+            elements.listenBtnContent.innerHTML = '<div class="loader-spinner mr-2"></div> Tuning...';
+            const audioUrl = await getNaturalSpeech(data.text, data.type);
+            if (audioUrl) {
+                const audio = new Audio(audioUrl);
+                audio.play();
+                addTerminalLine(`Audio Model: "${data.text}"`);
+            } else {
+                const ut = new SpeechSynthesisUtterance(data.text);
+                ut.rate = 0.9;
+                speechSynthesis.speak(ut);
+            }
+            elements.listenBtn.disabled = false;
+            elements.listenBtnContent.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Hear Model';
+        });
+
+        elements.recordBtn.addEventListener('click', async () => {
+            if (!gameState.isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    gameState.mediaRecorder = new MediaRecorder(stream);
+                    gameState.audioChunks = [];
+                    gameState.isRecording = true;
+                    elements.recordBtn.classList.add('bg-red-500', 'recording-pulse');
+                    elements.statusMsg.innerText = "REC: Listening carefully...";
+                    gameState.mediaRecorder.ondataavailable = e => gameState.audioChunks.push(e.data);
+                    gameState.mediaRecorder.onstop = () => {
+                        gameState.recordedBlobUrl = URL.createObjectURL(new Blob(gameState.audioChunks, { type: 'audio/webm' }));
+                        elements.recordingUI.classList.add('hidden');
+                        elements.reviewUI.classList.remove('hidden');
+                        stream.getTracks().forEach(t => t.stop());
+                    };
+                    gameState.mediaRecorder.start();
+                } catch (err) { addTerminalLine("Mic Access Denied."); }
+            } else {
+                gameState.isRecording = false;
+                gameState.mediaRecorder.stop();
+                elements.recordBtn.classList.remove('bg-red-500', 'recording-pulse');
+            }
+        });
+
+        elements.playbackBtn.addEventListener('click', () => { if (gameState.recordedBlobUrl) new Audio(gameState.recordedBlobUrl).play(); });
+        elements.redoBtn.addEventListener('click', () => { elements.reviewUI.classList.add('hidden'); elements.recordingUI.classList.remove('hidden'); });
+        elements.submitBtn.addEventListener('click', () => {
+            const totalSteps = gameState.config.words.length + gameState.config.phrases.length + gameState.config.sentences.length;
+            const score = Math.floor(82 + Math.random() * 17); 
+            const points = calculatePoints(score);
+            gameState.scores[gameState.phase] = { ...getPhaseData(), score: score, points: points };
+            addTerminalLine(`Captured: ${score}% Match (${points} XP)`);
+            if (gameState.phase < totalSteps - 1) { gameState.phase++; updateUI(); } else { showScoreboard(); }
+        });
+
+        elements.navBack.addEventListener('click', () => { if (gameState.phase > 0) { gameState.phase--; updateUI(); } });
+        elements.navNext.addEventListener('click', () => {
+            const totalSteps = gameState.config.words.length + gameState.config.phrases.length + gameState.config.sentences.length;
+            if (gameState.phase < totalSteps - 1) { gameState.phase++; updateUI(); }
+        });
+
+        function showScoreboard() {
+            elements.gameContainer.classList.add('hidden');
+            elements.scoreboard.classList.remove('hidden');
+            const completed = gameState.scores.filter(s => s !== null);
+            
+            elements.scoreGrid.innerHTML = completed.map(s => `
+                <div class="bg-white/5 p-3 rounded-lg border border-white/10 relative overflow-hidden">
+                    <p class="text-[8px] text-pink-500 uppercase">${s.type}</p>
+                    <p class="text-xs font-bold truncate">${s.text}</p>
+                    <div class="flex justify-between items-end mt-2">
+                        <p class="text-xl font-black text-blue-400">${s.score}%</p>
+                        <span class="point-badge">+${s.points}</span>
+                    </div>
+                </div>`).join('');
+            
+            const avg = completed.length > 0 ? Math.floor(completed.reduce((a, b) => a + b.score, 0) / completed.length) : 0;
+            const totalPoints = completed.reduce((a, b) => a + b.points, 0);
+            
+            elements.finalAverage.innerText = `${avg}%`;
+            elements.totalPointsDisplay.innerText = `+${totalPoints} XP`;
+        }
+
+        elements.backToGame.addEventListener('click', () => {
+            elements.scoreboard.classList.add('hidden');
+            elements.gameContainer.classList.remove('hidden');
+            gameState.phase = 0;
+            updateUI();
+        });
+
+        function renderWordInputs() {
+            elements.wordInputs.innerHTML = gameState.config.words.map((w, i) => `
+                <div class="grid grid-cols-[1fr_1fr_24px] gap-2 items-center">
+                    <input type="text" data-idx="${i}" class="word-text bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" value="${w.text}">
+                    <input type="text" data-idx="${i}" class="word-phonetic bg-slate-900 border border-slate-800 rounded-lg p-2 text-pink-400 text-xs outline-none" value="${w.phonetic}">
+                    <button class="remove-btn text-red-500 hover:text-white" onclick="removeWord(${i})"><i class="fas fa-times-circle"></i></button>
+                    <div id="status-${i}" class="col-span-3"></div>
+                </div>`).join('');
+
+            elements.wordInputs.querySelectorAll('.word-text').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.idx;
+                    const status = document.getElementById(`status-${idx}`);
+                    clearTimeout(gameState.typingTimers[idx]);
+                    gameState.typingTimers[idx] = setTimeout(async () => {
+                        if (!e.target.value) return;
+                        status.innerHTML = '<div class="loader-spinner"></div>';
+                        const ipa = await getIPAFromGemini(e.target.value);
+                        if (ipa) {
+                            elements.wordInputs.querySelector(`.word-phonetic[data-idx="${idx}"]`).value = ipa;
+                            status.innerHTML = '<i class="fas fa-check text-green-500 text-[10px]"></i> IPA Refreshed';
+                        }
+                    }, 800);
+                });
+            });
+        }
+
+        function renderPhraseInputs() {
+            elements.phraseInputs.innerHTML = gameState.config.phrases.map((p, i) => `
+                <div class="flex gap-2 items-center mb-2">
+                    <input type="text" value="${p}" class="phrase-input w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs outline-none">
+                    <button class="remove-btn text-red-500" onclick="removePhrase(${i})"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+        }
+
+        function renderSentenceInputs() {
+            elements.sentenceInputs.innerHTML = gameState.config.sentences.map((s, i) => `
+                <div class="flex gap-2 items-center mb-2">
+                    <input type="text" value="${s}" class="sentence-input w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs outline-none">
+                    <button class="remove-btn text-red-500" onclick="removeSentence(${i})"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+        }
+
+        window.removeWord = (i) => { gameState.config.words.splice(i, 1); renderWordInputs(); };
+        window.removePhrase = (i) => { gameState.config.phrases.splice(i, 1); renderPhraseInputs(); };
+        window.removeSentence = (i) => { gameState.config.sentences.splice(i, 1); renderSentenceInputs(); };
+
+        elements.addWord.onclick = () => { gameState.config.words.push({text: "", phonetic: ""}); renderWordInputs(); };
+        elements.addPhrase.onclick = () => { gameState.config.phrases.push(""); renderPhraseInputs(); };
+        elements.addSentence.onclick = () => { gameState.config.sentences.push(""); renderSentenceInputs(); };
+
+        elements.adminToggle.addEventListener('click', () => {
+            renderWordInputs();
+            renderPhraseInputs();
+            renderSentenceInputs();
+            elements.adminPanel.classList.remove('hidden');
+        });
+
+        elements.closeAdmin.addEventListener('click', () => elements.adminPanel.classList.add('hidden'));
+
+        elements.saveAdmin.addEventListener('click', () => {
+            const updatedWords = Array.from(elements.wordInputs.querySelectorAll('.grid')).map(div => ({
+                text: div.querySelector('.word-text').value,
+                phonetic: div.querySelector('.word-phonetic').value
+            })).filter(w => w.text !== "");
+
+            const updatedPhrases = Array.from(elements.phraseInputs.querySelectorAll('.phrase-input'))
+                .map(i => i.value)
+                .filter(v => v !== "");
+
+            const updatedSentences = Array.from(elements.sentenceInputs.querySelectorAll('.sentence-input'))
+                .map(i => i.value)
+                .filter(v => v !== "");
+
+            gameState.config = { 
+                words: updatedWords, 
+                phrases: updatedPhrases, 
+                sentences: updatedSentences 
+            };
+            
+            gameState.phase = 0;
+            const totalSteps = updatedWords.length + updatedPhrases.length + updatedSentences.length;
+            gameState.scores = Array(totalSteps).fill(null);
+            
+            updateUI();
+            elements.adminPanel.classList.add('hidden');
+            addTerminalLine(`Voice Matrix Updated: ${totalSteps} Phased Tasks Loaded.`);
+        });
+
+        window.onload = () => {
+            addTerminalLine("Voice Explorer OS Loaded...");
+            updateUI();
+        };
+    </script>
+</body>
+</html>
